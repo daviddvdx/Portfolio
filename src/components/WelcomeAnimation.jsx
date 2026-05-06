@@ -24,6 +24,7 @@ const createParticles = (count) => {
 export default function WelcomeAnimation({ onFinish, name = "David DONGA" }) {
     const [phase, setPhase] = useState("intro");
     const particles = useMemo(() => createParticles(CONFIG.PARTICLE_COUNT), []);
+
     const greeting = useMemo(() => {
         const hour = new Date().getHours();
         return hour >= 18 || hour < 5 ? "Bonsoir" : "Bonjour";
@@ -31,125 +32,292 @@ export default function WelcomeAnimation({ onFinish, name = "David DONGA" }) {
 
     useEffect(() => {
         const t1 = setTimeout(() => setPhase("collapsing"), CONFIG.COLLAPSE_DELAY);
+
         const t2 = setTimeout(() => {
             setPhase("hidden");
             setTimeout(() => onFinish?.(), CONFIG.FINISH_DELAY);
         }, CONFIG.EXIT_DELAY);
-        return () => { clearTimeout(t1); clearTimeout(t2); };
+
+        return () => {
+            clearTimeout(t1);
+            clearTimeout(t2);
+        };
     }, [onFinish]);
 
     return (
         <>
             <style>{`
-                :root {
-                    --c-primary: #a855f7;
-                    --c-glow: rgba(168, 85, 247, 0.6);
-                    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-                }
+        :root {
+          --c-primary: #a855f7;
+          --c-glow: rgba(168, 85, 247, 0.6);
+          --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
 
-                @keyframes tunnelTravel {
-                    0% { transform: rotate(var(--angle)) translateY(var(--dist)) translateZ(-1000px); opacity: 0; }
-                    20% { opacity: var(--opacity); }
-                    100% { transform: rotate(var(--angle)) translateY(0) translateZ(500px); opacity: 0; }
-                }
+        @keyframes tunnelTravel {
+          0% {
+            transform: rotate(var(--angle)) translateY(var(--dist)) translateZ(-1000px);
+            opacity: 0;
+          }
 
-                @keyframes glitchText {
-                    0% { text-shadow: 2px 0 red, -2px 0 blue; opacity: 0; }
-                    1% { opacity: 1; }
-                    2% { text-shadow: none; }
-                    100% { opacity: 1; }
-                }
+          20% {
+            opacity: var(--opacity);
+          }
 
-                .w-container {
-                    position: fixed; inset: 0; z-index: 9999;
-                    background: #000; display: flex; align-items: center; justify-content: center;
-                    perspective: 1000px; overflow: hidden;
-                    transition: opacity 0.8s ease;
-                }
+          100% {
+            transform: rotate(var(--angle)) translateY(0) translateZ(500px);
+            opacity: 0;
+          }
+        }
 
-                .w-scene {
-                    position: absolute; transform-style: preserve-3d;
-                    transition: transform 1s cubic-bezier(0.7, 0, 0.3, 1), filter 1s ease;
-                }
+        @keyframes glitchText {
+          0% {
+            text-shadow: 2px 0 red, -2px 0 blue;
+            opacity: 0;
+          }
 
-                .phase-collapsing .w-scene { transform: scale(0) rotate(360deg); filter: blur(20px); }
-                .phase-hidden { opacity: 0; pointer-events: none; }
+          1% {
+            opacity: 1;
+          }
 
-                .particle {
-                    position: absolute; width: var(--width); height: var(--height);
-                    background: linear-gradient(to top, transparent, var(--c-primary), #fff);
-                    transform-origin: bottom center; mix-blend-mode: screen;
-                    animation: tunnelTravel var(--duration) linear infinite;
-                    animation-delay: var(--delay);
-                }
+          2% {
+            text-shadow: none;
+          }
 
-                .w-content {
-                    position: relative; z-index: 10; text-align: center;
-                    animation: glitchText 0.1s stage-1 forwards;
-                }
+          100% {
+            opacity: 1;
+          }
+        }
 
-                .w-title {
-                    font-size: clamp(2.5rem, 8vw, 6rem); font-weight: 900; color: #fff;
-                    letter-spacing: -0.05em; line-height: 0.9; margin: 0;
-                    filter: drop-shadow(0 0 20px var(--c-glow));
-                }
+        @keyframes load {
+          to {
+            transform: scaleX(1);
+          }
+        }
 
-                .w-accent { color: var(--c-primary); }
+        .w-container {
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          background: #000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          perspective: 1000px;
+          overflow: hidden;
+          transition: opacity 0.8s ease;
+        }
 
-                .w-bar-container {
-                    width: 200px; height: 1px; background: rgba(255,255,255,0.1);
-                    margin: 2rem auto; position: relative; overflow: hidden;
-                }
+        .w-scene {
+          position: absolute;
+          transform-style: preserve-3d;
+          transition: transform 1s cubic-bezier(0.7, 0, 0.3, 1), filter 1s ease;
+        }
 
-                .w-bar-fill {
-                    position: absolute; inset: 0; background: var(--c-primary);
-                    transform: scaleX(0); transform-origin: left;
-                    animation: load 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-                    box-shadow: 0 0 15px var(--c-primary);
-                }
+        .phase-collapsing .w-scene {
+          transform: scale(0) rotate(360deg);
+          filter: blur(20px);
+        }
 
-                @keyframes load { to { transform: scaleX(1); } }
+        .phase-hidden {
+          opacity: 0;
+          pointer-events: none;
+        }
 
-                .w-sub {
-                    font-family: var(--font-mono); font-size: 10px; color: var(--c-primary);
-                    letter-spacing: 0.3em; text-transform: uppercase; opacity: 0.7;
-                }
-            `}</style>
+        .particle {
+          position: absolute;
+          width: var(--width);
+          height: var(--height);
+          background: linear-gradient(to top, transparent, var(--c-primary), #fff);
+          transform-origin: bottom center;
+          mix-blend-mode: screen;
+          animation: tunnelTravel var(--duration) linear infinite;
+          animation-delay: var(--delay);
+        }
+
+        .w-content {
+          position: relative;
+          z-index: 10;
+          text-align: center;
+          animation: glitchText 0.1s forwards;
+          padding: 0 18px;
+          box-sizing: border-box;
+        }
+
+        .w-title {
+          font-size: clamp(2.5rem, 8vw, 6rem);
+          font-weight: 900;
+          color: #fff;
+          letter-spacing: -0.05em;
+          line-height: 0.9;
+          margin: 0;
+          filter: drop-shadow(0 0 20px var(--c-glow));
+        }
+
+        .w-accent {
+          color: var(--c-primary);
+        }
+
+        .w-bar-container {
+          width: 200px;
+          height: 1px;
+          background: rgba(255,255,255,0.1);
+          margin: 2rem auto;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .w-bar-fill {
+          position: absolute;
+          inset: 0;
+          background: var(--c-primary);
+          transform: scaleX(0);
+          transform-origin: left;
+          animation: load 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+          box-shadow: 0 0 15px var(--c-primary);
+        }
+
+        .w-sub {
+          font-family: var(--font-mono);
+          font-size: 10px;
+          color: var(--c-primary);
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          opacity: 0.7;
+        }
+
+        /* Version tablette / smartphone */
+        @media (max-width: 768px) {
+          .w-container {
+            perspective: 760px;
+          }
+
+          .w-content {
+            width: 100%;
+            max-width: 380px;
+            padding: 0 22px;
+          }
+
+          .w-title {
+            font-size: clamp(3rem, 17vw, 4.8rem);
+            line-height: 0.86;
+            letter-spacing: -0.065em;
+          }
+
+          .w-sub {
+            font-size: 9px;
+            letter-spacing: 0.22em;
+            line-height: 1.6;
+          }
+
+          .w-bar-container {
+            width: min(220px, 68vw);
+            margin: 1.45rem auto;
+          }
+
+          .particle {
+            height: calc(var(--height) * 0.68);
+            width: calc(var(--width) * 0.9);
+          }
+
+          .w-halo {
+            width: 300px !important;
+            height: 300px !important;
+            filter: blur(34px) !important;
+          }
+
+          .phase-collapsing .w-scene {
+            filter: blur(16px);
+          }
+        }
+
+        /* Petits téléphones */
+        @media (max-width: 420px) {
+          .w-container {
+            perspective: 640px;
+          }
+
+          .w-content {
+            max-width: 330px;
+            padding: 0 18px;
+          }
+
+          .w-title {
+            font-size: clamp(2.55rem, 18vw, 4rem);
+            line-height: 0.88;
+          }
+
+          .w-sub {
+            font-size: 8px;
+            letter-spacing: 0.18em;
+          }
+
+          .w-bar-container {
+            width: min(190px, 64vw);
+            margin: 1.25rem auto;
+          }
+
+          .particle {
+            height: calc(var(--height) * 0.52);
+            width: calc(var(--width) * 0.75);
+          }
+
+          .w-halo {
+            width: 240px !important;
+            height: 240px !important;
+            filter: blur(30px) !important;
+          }
+        }
+      `}</style>
 
             <div className={`w-container phase-${phase}`}>
                 <div className="w-scene">
                     {/* Tunnel de particules 3D */}
-                    {particles.map(p => (
-                        <div key={p.id} className="particle" style={{
-                            '--angle': p.angle, '--duration': p.duration,
-                            '--delay': p.delay, '--height': p.height,
-                            '--width': p.width, '--opacity': p.opacity,
-                            '--dist': p.dist
-                        }} />
+                    {particles.map((p) => (
+                        <div
+                            key={p.id}
+                            className="particle"
+                            style={{
+                                "--angle": p.angle,
+                                "--duration": p.duration,
+                                "--delay": p.delay,
+                                "--height": p.height,
+                                "--width": p.width,
+                                "--opacity": p.opacity,
+                                "--dist": p.dist,
+                            }}
+                        />
                     ))}
 
                     {/* Halo central dynamique */}
-                    <div style={{
-                        position: 'absolute', width: '400px', height: '400px',
-                        background: 'radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%)',
-                        filter: 'blur(40px)', animation: 'pulseGlow 2s infinite'
-                    }} />
+                    <div
+                        className="w-halo"
+                        style={{
+                            position: "absolute",
+                            width: "400px",
+                            height: "400px",
+                            background:
+                                "radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%)",
+                            filter: "blur(40px)",
+                            animation: "pulseGlow 2s infinite",
+                        }}
+                    />
                 </div>
 
                 <div className="w-content">
-                    <div className="w-sub" style={{ marginBottom: '10px' }}>
+                    <div className="w-sub" style={{ marginBottom: "10px" }}>
                         {greeting} · SYSTEM_INIT_V.4
                     </div>
 
                     <h1 className="w-title">
-                        {name.split(' ')[0]} <span className="w-accent">{name.split(' ')[1]}</span>
+                        {name.split(" ")[0]}{" "}
+                        <span className="w-accent">{name.split(" ")[1]}</span>
                     </h1>
 
                     <div className="w-bar-container">
                         <div className="w-bar-fill" />
                     </div>
 
-                    <div className="w-sub" style={{ fontSize: '9px', opacity: 0.5 }}>
+                    <div className="w-sub" style={{ fontSize: "9px", opacity: 0.5 }}>
                         {">"} DEPLOYING_INTERFACE...
                     </div>
                 </div>
