@@ -208,7 +208,7 @@ export default function Hero() {
                         <ArrowUpRight style={styles.buttonIcon} size={18} />
                     </a>
 
-                    <a href="/src/CV_DONGA.pdf" download style={styles.secondaryButton}>
+                    <a href="/CV_DONGA.pdf" download style={styles.secondaryButton}>
                         Télécharger mon CV
                         <ArrowDownToLine style={styles.buttonIcon} size={18} />
                     </a>
